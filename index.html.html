@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Business&amp;Development — Mais que produtos, Uma experiência de compra</title>
+  <meta name="description" content="Business&Development — Mais que produtos, Uma experiência de compra. Os melhores preços do Mercado Livre para você." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── ML Tokens ── */
+    :root {
+      --ml-yellow:   #FFE600;
+      --ml-yellow-dk:#EBD200;
+      --ml-blue:     #2D3277;
+      --ml-blue-lt:  #3483FA;
+      --ml-green:    #00A650;
+      --ml-orange:   #FF6200;
+      --ml-red:      #F23D4F;
+      --ml-gray-bg:  #EDEDED;
+      --ml-gray-1:   #666;
+      --ml-gray-2:   #999;
+      --ml-gray-3:   #C0C0C0;
+      --ml-text:     #333;
+      --ml-white:    #FFFFFF;
+      --ml-border:   #E6E6E6;
+      --ml-shadow:   0 1px 2px rgba(0,0,0,.12);
+      --ml-shadow-hv:0 2px 8px rgba(0,0,0,.18);
+      --font: 'Inter', 'Proxima Nova', Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body  { font-family: var(--font); background: var(--ml-gray-bg); color: var(--ml-text); min-height: 100vh; }
+
+    /* ══════════════════════════
+       HEADER
+    ══════════════════════════ */
+    .ml-header {
+      background: var(--ml-yellow);
+      padding: 0 16px;
+      position: sticky; top: 0; z-index: 200;
+      border-bottom: 1px solid var(--ml-yellow-dk);
+    }
+    .ml-header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; gap: 12px;
+      height: 56px;
+    }
+    /* Logo */
+    .ml-logo {
+      display: flex; align-items: center; gap: 6px;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .ml-logo-icon {
+      width: 36px; height: 36px; background: var(--ml-blue);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: var(--ml-yellow); letter-spacing: -.5px;
+    }
+    .ml-logo-text {
+      font-size: 13px; font-weight: 700; color: var(--ml-blue);
+      line-height: 1.1; max-width: 100px;
+    }
+    .ml-logo-text em { font-style: normal; display: block; }
+    /* Search */
+    .ml-search { flex: 1; position: relative; }
+    .ml-search-input {
+      width: 100%; height: 36px; padding: 0 44px 0 14px;
+      border: none; border-radius: 2px;
+      font-size: 14px; font-family: var(--font); color: var(--ml-text);
+      background: var(--ml-white);
+      box-shadow: 0 1px 2px rgba(0,0,0,.1);
+      outline: none;
+    }
+    .ml-search-input::placeholder { color: var(--ml-gray-2); }
+    .ml-search-btn {
+      position: absolute; right: 0; top: 0; height: 36px; width: 42px;
+      background: var(--ml-blue); border: none; cursor: pointer;
+      border-radius: 0 2px 2px 0; color: var(--ml-white); font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ml-search-btn:hover { background: #1e2260; }
+    /* Nav links */
+    .ml-nav { display: flex; gap: 16px; flex-shrink: 0; }
+    .ml-nav a {
+      font-size: 13px; color: var(--ml-blue); text-decoration: none; font-weight: 500; white-space: nowrap;
+    }
+    .ml-nav a:hover { text-decoration: underline; }
+
+    /* ══════════════════════════
+       SUB-NAV / CATEGORIES
+    ══════════════════════════ */
+    .ml-subnav {
+      background: var(--ml-white); border-bottom: 1px solid var(--ml-border);
+    }
+    .ml-subnav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 16px;
+      display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
+    }
+    .ml-subnav-inner::-webkit-scrollbar { display: none; }
+    .ml-cat-btn {
+      font-size: 13px; color: var(--ml-text); text-decoration: none; white-space: nowrap;
+      padding: 10px 14px; display: block; border-bottom: 2px solid transparent;
+      cursor: pointer; background: none; border-left: none; border-right: none; border-top: none;
+      font-family: var(--font); font-weight: 400;
+      transition: color .15s;
+    }
+    .ml-cat-btn:hover   { color: var(--ml-blue-lt); border-bottom-color: var(--ml-blue-lt); }
+    .ml-cat-btn.active  { color: var(--ml-blue-lt); border-bottom-color: var(--ml-blue-lt); font-weight: 600; }
+
+    /* ══════════════════════════
+       BODY WRAPPER
+    ══════════════════════════ */
+    .ml-body { max-width: 1200px; margin: 0 auto; padding: 16px 16px 48px; }
+
+    /* ══════════════════════════
+       HERO BANNER
+    ══════════════════════════ */
+    .ml-hero {
+      background: linear-gradient(100deg, var(--ml-blue) 0%, #3483FA 100%);
+      border-radius: 6px; padding: 0;
+      margin-bottom: 16px; overflow: hidden;
+      display: flex; align-items: stretch; min-height: 160px;
+      position: relative;
+    }
+    .ml-hero-content {
+      padding: 28px 32px; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px;
+    }
+    .ml-hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--ml-yellow); text-transform: uppercase; letter-spacing: .08em; }
+    .ml-hero-title   { font-size: 28px; font-weight: 700; color: var(--ml-white); line-height: 1.15; }
+    .ml-hero-sub     { font-size: 13px; color: rgba(255,255,255,.78); }
+    .ml-hero-cta {
+      display: inline-block; margin-top: 4px;
+      background: var(--ml-yellow); color: var(--ml-blue);
+      font-size: 13px; font-weight: 700; padding: 9px 22px;
+      border-radius: 4px; text-decoration: none; width: fit-content;
+      transition: background .15s;
+    }
+    .ml-hero-cta:hover { background: var(--ml-yellow-dk); }
+    .ml-hero-deco {
+      width: 200px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 90px; opacity: .18;
+    }
+
+    /* ══════════════════════════
+       CATEGORY PILLS
+    ══════════════════════════ */
+    .ml-pills-wrap {
+      background: var(--ml-white); border-radius: 6px;
+      padding: 16px; margin-bottom: 16px;
+      box-shadow: var(--ml-shadow);
+    }
+    .ml-pills-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .ml-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ml-pill {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 14px; border-radius: 6px;
+      border: 1px solid var(--ml-border); background: var(--ml-white);
+      cursor: pointer; font-family: var(--font); transition: box-shadow .15s, border-color .15s;
+      min-width: 80px; text-align: center;
+    }
+    .ml-pill:hover { box-shadow: var(--ml-shadow-hv); border-color: var(--ml-blue-lt); }
+    .ml-pill.active { border-color: var(--ml-blue-lt); background: #EEF5FE; }
+    .ml-pill-icon { font-size: 22px; line-height: 1; }
+    .ml-pill-label { font-size: 11px; color: var(--ml-text); font-weight: 500; }
+
+    /* ══════════════════════════
+       TOOLBAR
+    ══════════════════════════ */
+    .ml-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+    }
+    .ml-result-info { font-size: 13px; color: var(--ml-gray-1); }
+    .ml-result-info strong { color: var(--ml-text); }
+    .ml-sort-wrap { display: flex; align-items: center; gap: 6px; }
+    .ml-sort-label { font-size: 13px; color: var(--ml-gray-1); }
+    .ml-sort-select {
+      font-size: 13px; padding: 5px 10px; border-radius: 4px;
+      border: 1px solid var(--ml-border); background: var(--ml-white);
+      color: var(--ml-text); font-family: var(--font); cursor: pointer; outline: none;
+    }
+    .ml-sort-select:focus { border-color: var(--ml-blue-lt); }
+
+    /* ══════════════════════════
+       PRODUCT GRID
+    ══════════════════════════ */
+    .ml-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Card ── */
+    .ml-card {
+      background: var(--ml-white); border-radius: 6px;
+      box-shadow: var(--ml-shadow); overflow: hidden;
+      display: flex; flex-direction: column;
+      text-decoration: none; color: var(--ml-text);
+      transition: box-shadow .15s, transform .15s;
+      border: 1px solid transparent;
+    }
+    .ml-card:hover { box-shadow: var(--ml-shadow-hv); transform: translateY(-2px); border-color: var(--ml-border); }
+
+    .ml-card-img-wrap {
+      width: 100%; height: 190px; overflow: hidden;
+      background: var(--ml-white); display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid var(--ml-border);
+    }
+    .ml-card-img-wrap img {
+      width: 100%; height: 100%; object-fit: contain;
+      padding: 8px; transition: transform .3s;
+    }
+    .ml-card:hover .ml-card-img-wrap img { transform: scale(1.05); }
+    .ml-card-emoji { font-size: 56px; }
+
+    .ml-card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+
+    .ml-card-name {
+      font-size: 13px; color: var(--ml-text); line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .ml-card-orig  { font-size: 11px; color: var(--ml-gray-2); text-decoration: line-through; }
+    .ml-card-price { font-size: 22px; font-weight: 400; color: var(--ml-text); line-height: 1.1; }
+    .ml-card-disc  {
+      font-size: 12px; color: var(--ml-green); font-weight: 600;
+    }
+    .ml-card-install { font-size: 12px; color: var(--ml-gray-1); }
+
+    .ml-card-shipping {
+      font-size: 12px; color: var(--ml-green); font-weight: 600; margin-top: 4px;
+    }
+    .ml-card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .ml-tag {
+      font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 600;
+    }
+    .ml-tag-best { background: #FFF0D9; color: #C47A22; }
+    .ml-tag-off  { background: #E8F5E9; color: var(--ml-green); }
+
+    .ml-card-cta {
+      display: block; margin-top: 10px;
+      background: var(--ml-blue-lt); color: var(--ml-white);
+      text-align: center; font-size: 13px; font-weight: 600;
+      padding: 10px; border-radius: 4px; text-decoration: none;
+      transition: background .15s;
+    }
+    .ml-card-cta:hover { background: #2a6edb; }
+
+    /* ══════════════════════════
+       LOAD MORE
+    ══════════════════════════ */
+    .ml-load-more-wrap { text-align: center; margin-bottom: 24px; }
+    .ml-load-more-btn {
+      background: var(--ml-white); border: 1px solid var(--ml-blue-lt);
+      color: var(--ml-blue-lt); border-radius: 4px; padding: 11px 36px;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font);
+      transition: background .15s;
+    }
+    .ml-load-more-btn:hover    { background: #EEF5FE; }
+    .ml-load-more-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ══════════════════════════
+       STATES
+    ══════════════════════════ */
+    .ml-state {
+      grid-column: 1/-1; text-align: center;
+      padding: 3rem 1rem; color: var(--ml-gray-1); font-size: 14px;
+      background: var(--ml-white); border-radius: 6px;
+    }
+    .ml-spinner {
+      width: 32px; height: 32px; margin: 0 auto 12px;
+      border: 3px solid var(--ml-border); border-top-color: var(--ml-blue-lt);
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ml-retry-btn {
+      margin-top: 14px; padding: 9px 22px; border-radius: 4px;
+      border: 1px solid var(--ml-blue-lt); color: var(--ml-blue-lt);
+      background: none; font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: var(--font);
+    }
+    .ml-retry-btn:hover { background: #EEF5FE; }
+
+    /* ══════════════════════════
+       FOOTER
+    ══════════════════════════ */
+    .ml-footer {
+      background: var(--ml-blue); color: rgba(255,255,255,.7);
+      padding: 24px 16px;
+    }
+    .ml-footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+    }
+    .ml-footer-brand { font-size: 16px; font-weight: 700; color: var(--ml-yellow); }
+    .ml-footer p { font-size: 12px; line-height: 1.6; }
+    .ml-footer a { color: var(--ml-yellow); text-decoration: none; }
+    .ml-footer a:hover { text-decoration: underline; }
+
+    /* ══════════════════════════
+       RESPONSIVE
+    ══════════════════════════ */
+    @media (max-width: 768px) {
+      .ml-hero-deco  { display: none; }
+      .ml-hero-title { font-size: 20px; }
+      .ml-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .ml-nav  { display: none; }
+    }
+    @media (max-width: 420px) {
+      .ml-grid { grid-template-columns: repeat(2, 1fr); }
+      .ml-card-img-wrap { height: 140px; }
+      .ml-card-price { font-size: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ml-spinner, .ml-card, .ml-card img { animation: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="ml-header">
+  <div class="ml-header-inner">
+    <a class="ml-logo" href="#" aria-label="Business&amp;Development">
+      <div class="ml-logo-icon">B&amp;D</div>
+      <div class="ml-logo-text">
+        <em>Business&amp;</em>
+        <em>Development</em>
+      </div>
+    </a>
+    <div class="ml-search">
+      <input class="ml-search-input" id="searchInput" type="search" placeholder="Buscar em Business&amp;Development" aria-label="Buscar produtos" />
+      <button class="ml-search-btn" id="searchBtn" aria-label="Buscar">🔍</button>
+    </div>
+    <nav class="ml-nav" aria-label="Links rápidos">
+      <a href="https://www.mercadolivre.com.br/social/rosapablo3252" target="_blank" rel="noopener">Meu perfil</a>
+      <a href="https://www.mercadolivre.com.br/social/rosapablo3252" target="_blank" rel="noopener">Ofertas</a>
+      <a href="https://www.mercadolivre.com.br/social/rosapablo3252" target="_blank" rel="noopener">Histórico</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ══ SUB-NAV ══ -->
+<nav class="ml-subnav" aria-label="Categorias">
+  <div class="ml-subnav-inner">
+    <button class="ml-cat-btn active" data-q="moda feminina roupas">Moda</button>
+    <button class="ml-cat-btn" data-q="vestido feminino">Vestidos</button>
+    <button class="ml-cat-btn" data-q="blusa feminina">Blusas</button>
+    <button class="ml-cat-btn" data-q="tenis feminino casual">Calçados</button>
+    <button class="ml-cat-btn" data-q="bolsa feminina">Bolsas &amp; Acessórios</button>
+    <button class="ml-cat-btn" data-q="decoracao casa sala">Decoração</button>
+    <button class="ml-cat-btn" data-q="cama mesa banho">Cama &amp; Banho</button>
+    <button class="ml-cat-btn" data-q="luminaria decorativa">Iluminação</button>
+    <button class="ml-cat-btn" data-q="vaso planta decorativo">Jardim</button>
+  </div>
+</nav>
+
+<!-- ══ BODY ══ -->
+<main class="ml-body">
+
+  <!-- Hero -->
+  <div class="ml-hero" role="banner">
+    <div class="ml-hero-content">
+      <span class="ml-hero-eyebrow">Business &amp; Development</span>
+      <h1 class="ml-hero-title">Mais que produtos,<br>Uma experiência de compra</h1>
+      <p class="ml-hero-sub">Curadoria especial direto do Mercado Livre para você</p>
+      <a class="ml-hero-cta" href="https://www.mercadolivre.com.br/social/rosapablo3252" target="_blank" rel="noopener">Ver todos os produtos ↗</a>
+    </div>
+    <div class="ml-hero-deco" aria-hidden="true">🛍️</div>
+  </div>
+
+  <!-- Category pills -->
+  <div class="ml-pills-wrap">
+    <p class="ml-pills-title">Comprar por categoria</p>
+    <div class="ml-pills" id="pills" role="group" aria-label="Filtrar por categoria">
+      <button class="ml-pill active" data-q="moda feminina roupas"><span class="ml-pill-icon">👗</span><span class="ml-pill-label">Moda feminina</span></button>
+      <button class="ml-pill" data-q="tenis feminino casual"><span class="ml-pill-icon">👟</span><span class="ml-pill-label">Calçados</span></button>
+      <button class="ml-pill" data-q="bolsa feminina"><span class="ml-pill-icon">👜</span><span class="ml-pill-label">Bolsas</span></button>
+      <button class="ml-pill" data-q="decoracao casa sala"><span class="ml-pill-icon">🪴</span><span class="ml-pill-label">Decoração</span></button>
+      <button class="ml-pill" data-q="cama mesa banho"><span class="ml-pill-icon">🛏️</span><span class="ml-pill-label">Cama &amp; Banho</span></button>
+      <button class="ml-pill" data-q="luminaria decorativa"><span class="ml-pill-icon">💡</span><span class="ml-pill-label">Iluminação</span></button>
+      <button class="ml-pill" data-q="vaso planta decorativo"><span class="ml-pill-icon">🌿</span><span class="ml-pill-label">Jardim</span></button>
+      <button class="ml-pill" data-q="jogo de panelas"><span class="ml-pill-icon">🍳</span><span class="ml-pill-label">Cozinha</span></button>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="ml-toolbar">
+    <p class="ml-result-info" id="resultInfo"></p>
+    <div class="ml-sort-wrap">
+      <span class="ml-sort-label">Ordenar por</span>
+      <select class="ml-sort-select" id="sortSelect" aria-label="Ordenar resultados">
+        <option value="">Mais relevantes</option>
+        <option value="price_asc">Menor preço</option>
+        <option value="price_desc">Maior preço</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="ml-grid" id="mlGrid" role="list" aria-live="polite" aria-busy="true"></div>
+
+  <!-- Load more -->
+  <div class="ml-load-more-wrap" id="loadMoreWrap" style="display:none">
+    <button class="ml-load-more-btn" id="loadMoreBtn">Mostrar mais resultados</button>
+  </div>
+
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="ml-footer">
+  <div class="ml-footer-inner">
+    <div class="ml-footer-brand">Business&amp;Development</div>
+    <p>
+      Links de afiliado via
+      <a href="https://www.mercadolivre.com.br/social/rosapablo3252" target="_blank" rel="noopener">Mercado Livre</a>
+      · Perfil <strong style="color:#ffe600">rosapablo3252</strong>
+      · Ao comprar pelo link você apoia esta loja 💛
+    </p>
+    <p>© 2026 Business&amp;Development — Todos os direitos reservados</p>
+  </div>
+</footer>
+
+<script>
+  /* ── Config ── */
+  const AFFILIATE = 'https://www.mercadolivre.com.br/social/rosapablo3252';
+  const API_BASE  = 'https://api.mercadolibre.com/sites/MLB/search';
+  const PAGE_SIZE = 16;
+
+  /* ── State ── */
+  let query   = 'moda feminina roupas';
+  let offset  = 0;
+  let total   = 0;
+  let sort    = '';
+  let loading = false;
+
+  /* ── Helpers ── */
+  const fmt = n =>
+    'R$\u00a0' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const disc = (price, orig) =>
+    orig && orig > price ? Math.round((1 - price / orig) * 100) : 0;
+
+  const guessEmoji = q => {
+    q = q.toLowerCase();
+    if (q.includes('vestido'))  return '👗';
+    if (q.includes('blusa'))    return '👕';
+    if (q.includes('tenis'))    return '👟';
+    if (q.includes('bolsa'))    return '👜';
+    if (q.includes('lencol') || q.includes('cama') || q.includes('banho')) return '🛏️';
+    if (q.includes('luminaria') || q.includes('ilumina')) return '💡';
+    if (q.includes('vaso') || q.includes('jardim') || q.includes('planta')) return '🌿';
+    if (q.includes('decorac'))  return '🪴';
+    if (q.includes('panela') || q.includes('cozinha')) return '🍳';
+    if (q.includes('moda'))     return '👗';
+    return '🛍️';
+  };
+
+  const installments = price => {
+    const parc = Math.ceil(price / 12);
+    return `em 12x R$\u00a0${parc.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros`;
+  };
+
+  /* ── Render card ── */
+  function cardHTML(item) {
+    const pct   = disc(item.price, item.original_price);
+    const img   = item.thumbnail
+      ? item.thumbnail.replace(/^http:/, 'https:').replace('I.jpg', 'O.jpg')
+      : null;
+    const free  = item.shipping?.free_shipping;
+    const rated = item.seller?.seller_reputation?.level_id === 'platinum' || item.sold_quantity > 50;
+
+    return `
+    <a class="ml-card" href="${AFFILIATE}" target="_blank" rel="noopener sponsored" role="listitem" aria-label="${item.title}">
+      <div class="ml-card-img-wrap">
+        ${img
+          ? `<img src="${img}" alt="${item.title}" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />`
+          : ''}
+        <div class="ml-card-emoji" style="${img ? 'display:none' : ''}" aria-hidden="true">${guessEmoji(query)}</div>
+      </div>
+      <div class="ml-card-body">
+        <p class="ml-card-name">${item.title}</p>
+        ${item.original_price
+          ? `<p class="ml-card-orig">${fmt(item.original_price)}</p>`
+          : ''}
+        <p class="ml-card-price">${fmt(item.price)}</p>
+        ${pct >= 5
+          ? `<p class="ml-card-disc">${pct}% OFF</p>`
+          : ''}
+        ${item.price > 99
+          ? `<p class="ml-card-install">${installments(item.price)}</p>`
+          : ''}
+        ${free
+          ? `<p class="ml-card-shipping">Frete grátis</p>`
+          : ''}
+        <div class="ml-card-tags">
+          ${rated ? '<span class="ml-tag ml-tag-best">Mais vendido</span>' : ''}
+          ${pct >= 20 ? '<span class="ml-tag ml-tag-off">Oferta</span>' : ''}
+        </div>
+        <a class="ml-card-cta" href="${AFFILIATE}" target="_blank" rel="noopener">Comprar no Mercado Livre</a>
+      </div>
+    </a>`;
+  }
+
+  /* ── Loading state ── */
+  function showLoading() {
+    document.getElementById('mlGrid').innerHTML = `
+      <div class="ml-state" role="status">
+        <div class="ml-spinner" aria-hidden="true"></div>
+        Buscando produtos...
+      </div>`;
+    document.getElementById('resultInfo').textContent = '';
+    document.getElementById('loadMoreWrap').style.display = 'none';
+  }
+
+  /* ── Error state ── */
+  function showError() {
+    document.getElementById('mlGrid').innerHTML = `
+      <div class="ml-state">
+        <p style="font-size:28px;margin-bottom:12px">😕</p>
+        <p>Não foi possível carregar os produtos.<br>Verifique sua conexão e tente novamente.</p>
+        <button class="ml-retry-btn" onclick="runSearch(query)">Tentar novamente</button>
+        <br><br>
+        <a href="${AFFILIATE}" target="_blank" rel="noopener" style="color:var(--ml-blue-lt);font-size:13px;font-weight:600">
+          Visitar meu perfil no Mercado Livre ↗
+        </a>
+      </div>`;
+    document.getElementById('loadMoreWrap').style.display = 'none';
+  }
+
+  /* ── Render results ── */
+  function renderResults(items, append) {
+    const grid = document.getElementById('mlGrid');
+
+    if (!append) {
+      grid.setAttribute('aria-busy', 'false');
+      if (!items.length) {
+        grid.innerHTML = `
+          <div class="ml-state">
+            <p style="font-size:28px;margin-bottom:12px">🔍</p>
+            <p>Nenhum produto encontrado para "<strong>${query}</strong>".<br>Tente outro termo.</p>
+          </div>`;
+        document.getElementById('loadMoreWrap').style.display = 'none';
+        document.getElementById('resultInfo').textContent = '';
+        return;
+      }
+      grid.innerHTML = items.map(cardHTML).join('');
+    } else {
+      grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
+    }
+
+    const showing = grid.querySelectorAll('.ml-card').length;
+    document.getElementById('resultInfo').textContent =
+      total > 0 ? `${showing.toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')} resultados para "${query}"` : '';
+
+    const canMore = offset < total && offset < 96;
+    document.getElementById('loadMoreWrap').style.display = canMore ? 'block' : 'none';
+  }
+
+  /* ── Fetch ── */
+  async function fetchProducts(q, off, srt, append) {
+    if (loading) return;
+    loading = true;
+    const btn = document.getElementById('loadMoreBtn');
+    if (btn) btn.disabled = true;
+    if (!append) showLoading();
+
+    try {
+      let url = `${API_BASE}?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE}&offset=${off}&condition=new`;
+      if (srt) url += `&sort=${srt}`;
+      const r = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!r.ok) throw new Error('API ' + r.status);
+      const data = await r.json();
+      total  = data.paging?.total || 0;
+      offset = off + (data.results?.length || 0);
+      renderResults(data.results || [], append);
+    } catch {
+      if (!append) showError();
+    } finally {
+      loading = false;
+      const b = document.getElementById('loadMoreBtn');
+      if (b) b.disabled = false;
+    }
+  }
+
+  /* ── Run search ── */
+  function runSearch(q) {
+    query  = q;
+    offset = 0;
+    total  = 0;
+
+    // Sync sub-nav
+    document.querySelectorAll('.ml-cat-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.q === q));
+
+    // Sync pills
+    document.querySelectorAll('.ml-pill').forEach(b =>
+      b.classList.toggle('active', b.dataset.q === q));
+
+    fetchProducts(q, 0, sort, false);
+  }
+
+  /* ── Sub-nav clicks ── */
+  document.querySelector('.ml-subnav-inner').addEventListener('click', e => {
+    const btn = e.target.closest('.ml-cat-btn');
+    if (btn) runSearch(btn.dataset.q);
+  });
+
+  /* ── Pills clicks ── */
+  document.getElementById('pills').addEventListener('click', e => {
+    const btn = e.target.closest('.ml-pill');
+    if (btn) runSearch(btn.dataset.q);
+  });
+
+  /* ── Sort ── */
+  document.getElementById('sortSelect').addEventListener('change', e => {
+    sort   = e.target.value;
+    offset = 0;
+    fetchProducts(query, 0, sort, false);
+  });
+
+  /* ── Search bar ── */
+  function doSearch() {
+    const v = document.getElementById('searchInput').value.trim();
+    if (v) runSearch(v);
+  }
+  document.getElementById('searchBtn').addEventListener('click', doSearch);
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  /* ── Load more ── */
+  document.getElementById('loadMoreBtn').addEventListener('click', () =>
+    fetchProducts(query, offset, sort, true));
+
+  /* ── Init ── */
+  fetchProducts(query, 0, '', false);
+</script>
+</body>
+</html>
