@@ -781,7 +781,11 @@
     } finally {
       loading = false;
       const b = document.getElementById('loadMoreBtn');
-      if (b) b.disabled = false;/* ── Run search ── */
+      if (b) b.disabled = false;
+    }
+  }
+
+  /* ── Run search ── */
   function runSearch(q) {
     query  = q;
     offset = 0;
