@@ -432,6 +432,7 @@
   /* ── Config ── */
   const AFFILIATE = 'https://www.mercadolivre.com.br/social/rosapablo3252';
   const API_BASE  = 'https://api.mercadolibre.com/sites/MLB/search';
+  const PROXY     = 'https://corsproxy.io/?url=';
   const PAGE_SIZE = 16;
 
   /* ── State ── */
@@ -574,8 +575,9 @@
     if (!append) showLoading();
 
     try {
-      let url = `${API_BASE}?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE}&offset=${off}&condition=new`;
-      if (srt) url += `&sort=${srt}`;
+      let mlUrl = `${API_BASE}?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE}&offset=${off}&condition=new`;
+      if (srt) mlUrl += `&sort=${srt}`;
+      const url = PROXY + encodeURIComponent(mlUrl);
       const r = await fetch(url, { headers: { Accept: 'application/json' } });
       if (!r.ok) throw new Error('API ' + r.status);
       const data = await r.json();
