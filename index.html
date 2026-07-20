@@ -431,8 +431,6 @@
 <script>
   /* ── Config ── */
   const AFFILIATE = 'https://www.mercadolivre.com.br/social/rosapablo3252';
-  const API_BASE  = 'https://api.mercadolibre.com/sites/MLB/search';
-  const PROXY     = 'https://corsproxy.io/?url=';
   const PAGE_SIZE = 16;
 
   /* ── State ── */
@@ -566,25 +564,7 @@
     document.getElementById('loadMoreWrap').style.display = canMore ? 'block' : 'none';
   }
 
-  /* ── Fetch com múltiplos proxies ── */
-  const PROXIES = [
-    mlUrl => `https://api.allorigins.win/raw?url=${encodeURIComponent(mlUrl)}`,
-    mlUrl => `https://corsproxy.io/?url=${encodeURIComponent(mlUrl)}`,
-    mlUrl => `https://thingproxy.freeboard.io/fetch/${mlUrl}`,
-  ];
-
-  async function tryFetch(mlUrl) {
-    for (const proxyFn of PROXIES) {
-      try {
-        const r = await fetch(proxyFn(mlUrl), { headers: { Accept: 'application/json' } });
-        if (!r.ok) continue;
-        const data = await r.json();
-        if (data && data.results !== undefined) return data;
-      } catch(e) { continue; }
-    }
-    throw new Error('Todos os proxies falharam');
-  }
-
+  /* ── Fetch via Claude API ── */
   async function fetchProducts(q, off, srt, append) {
     if (loading) return;
     loading = true;
@@ -593,13 +573,40 @@
     if (!append) showLoading();
 
     try {
-      let mlUrl = `${API_BASE}?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE}&offset=${off}&condition=new`;
-      if (srt) mlUrl += `&sort=${srt}`;
-      const data = await tryFetch(mlUrl);
-      total  = data.paging?.total || 0;
+      const sortLabel = srt === 'price_asc' ? 'mais baratos primeiro' : srt === 'price_desc' ? 'mais caros primeiro' : 'mais relevantes';
+      const prompt = `Você é um assistente de e-commerce. Gere uma lista de ${PAGE_SIZE} produtos fictícios mas realistas de Mercado Livre para a categoria: "${q}". Ordenação: ${sortLabel}. Offset: ${off}.
+
+Responda APENAS com JSON válido, sem markdown, sem explicações, no formato exato:
+{"results":[{"title":"Nome do produto","price":99.90,"original_price":149.90,"thumbnail":"","shipping":{"free_shipping":true},"sold_quantity":120}],"paging":{"total":200}}
+
+Regras:
+- Gere exatamente ${PAGE_SIZE} produtos
+- Preços realistas em reais brasileiros
+- original_price apenas quando houver desconto (nem sempre)
+- free_shipping true em ~60% dos produtos
+- sold_quantity entre 10 e 5000
+- thumbnail deve ser string vazia ""
+- Títulos em português, detalhados e realistas como os do Mercado Livre`;
+
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 3000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const apiData = await resp.json();
+      const text = apiData.content?.[0]?.text || '{}';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const data = JSON.parse(clean);
+
+      total  = data.paging?.total || PAGE_SIZE;
       offset = off + (data.results?.length || 0);
       renderResults(data.results || [], append);
-    } catch {
+    } catch(e) {
       if (!append) showError();
     } finally {
       loading = false;
