@@ -248,6 +248,25 @@
     .ml-card-shipping {
       font-size: 12px; color: var(--ml-green); font-weight: 600; margin-top: 4px;
     }
+    .ml-card-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .ml-btn-buy {
+      display: block; width: 100%; text-align: center;
+      background: #3483FA; color: white;
+      font-size: 13px; font-weight: 600; padding: 10px;
+      border-radius: 4px; text-decoration: none;
+      transition: background .15s; border: none; cursor: pointer;
+      font-family: var(--font);
+    }
+    .ml-btn-buy:hover { background: #2a6edb; }
+    .ml-btn-cart {
+      display: block; width: 100%; text-align: center;
+      background: #EEF5FE; color: #3483FA;
+      font-size: 13px; font-weight: 600; padding: 10px;
+      border-radius: 4px; text-decoration: none;
+      transition: background .15s; border: 1.5px solid #3483FA; cursor: pointer;
+      font-family: var(--font);
+    }
+    .ml-btn-cart:hover { background: #dceeff; }
 
     /* ══════════════════════════
        LOAD MORE
@@ -502,6 +521,10 @@
           ? `<p class="ml-card-install">em 12x R$ ${(item.price/12).toLocaleString('pt-BR',{minimumFractionDigits:2})} sem juros</p>`
           : ''}
         ${free ? `<p class="ml-card-shipping">Frete grátis</p>` : ''}
+        <div class="ml-card-actions">
+          <a class="ml-btn-buy" href="${itemUrl}" target="_blank" rel="noopener">Comprar agora</a>
+          <a class="ml-btn-cart" href="${itemUrl}" target="_blank" rel="noopener">Adicionar ao carrinho</a>
+        </div>
       </div>
     </a>`;
   }
