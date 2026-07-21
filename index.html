@@ -208,50 +208,46 @@
     .ml-card:hover { box-shadow: var(--ml-shadow-hv); transform: translateY(-2px); border-color: var(--ml-border); }
 
     .ml-card-img-wrap {
-      width: 100%; height: 190px; overflow: hidden;
+      width: 100%; height: 200px; overflow: hidden;
       background: var(--ml-white); display: flex; align-items: center; justify-content: center;
-      border-bottom: 1px solid var(--ml-border);
+      position: relative;
     }
     .ml-card-img-wrap img {
       width: 100%; height: 100%; object-fit: contain;
-      padding: 8px; transition: transform .3s;
+      padding: 12px; transition: transform .3s;
     }
-    .ml-card:hover .ml-card-img-wrap img { transform: scale(1.05); }
+    .ml-card:hover .ml-card-img-wrap img { transform: scale(1.04); }
     .ml-card-emoji { font-size: 56px; }
+    .ml-card-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: var(--ml-orange); color: white;
+      font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 3px;
+    }
 
-    .ml-card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+    .ml-card-body { padding: 10px 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
 
     .ml-card-name {
-      font-size: 13px; color: var(--ml-text); line-height: 1.35;
+      font-size: 13px; color: var(--ml-text); line-height: 1.4;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
-
-    .ml-card-orig  { font-size: 11px; color: var(--ml-gray-2); text-decoration: line-through; }
-    .ml-card-price { font-size: 22px; font-weight: 400; color: var(--ml-text); line-height: 1.1; }
-    .ml-card-disc  {
-      font-size: 12px; color: var(--ml-green); font-weight: 600;
+    .ml-card-brand {
+      font-size: 12px; color: var(--ml-gray-1); margin-bottom: 2px;
     }
+    .ml-verified { color: var(--ml-blue-lt); font-size: 11px; }
+    .ml-card-stars {
+      font-size: 12px; color: #f5a623; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
+    }
+    .ml-card-sold { font-size: 11px; color: var(--ml-gray-2); }
+    .ml-card-orig { font-size: 12px; color: var(--ml-gray-2); text-decoration: line-through; }
+    .ml-card-price {
+      font-size: 13px; color: var(--ml-text); line-height: 1.1; margin: 1px 0;
+    }
+    .ml-card-price strong { font-size: 22px; font-weight: 400; }
     .ml-card-install { font-size: 12px; color: var(--ml-gray-1); }
-
     .ml-card-shipping {
       font-size: 12px; color: var(--ml-green); font-weight: 600; margin-top: 4px;
     }
-    .ml-card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-    .ml-tag {
-      font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 600;
-    }
-    .ml-tag-best { background: #FFF0D9; color: #C47A22; }
-    .ml-tag-off  { background: #E8F5E9; color: var(--ml-green); }
-
-    .ml-card-cta {
-      display: block; margin-top: 10px;
-      background: var(--ml-blue-lt); color: var(--ml-white);
-      text-align: center; font-size: 13px; font-weight: 600;
-      padding: 10px; border-radius: 4px; text-decoration: none;
-      transition: background .15s;
-    }
-    .ml-card-cta:hover { background: #2a6edb; }
 
     /* ══════════════════════════
        LOAD MORE
@@ -469,14 +465,18 @@
 
   /* ── Render card ── */
   function cardHTML(item) {
-    const pct   = disc(item.price, item.original_price);
+    const pct   = item.original_price && item.original_price > item.price
+      ? Math.round((1 - item.price / item.original_price) * 100) : 0;
     const img   = item.thumbnail
-      ? item.thumbnail.replace(/^http:/, 'https:').replace('I.jpg', 'O.jpg')
+      ? item.thumbnail.replace(/^http:/, 'https:')
       : null;
     const free  = item.shipping?.free_shipping;
-    const rated = item.seller?.seller_reputation?.level_id === 'platinum' || item.sold_quantity > 50;
-
+    const stars = item.rating || 4.8;
+    const sold  = item.sold_quantity >= 1000
+      ? '+' + Math.floor(item.sold_quantity/1000) + 'mil vendidos'
+      : item.sold_quantity + ' vendidos';
     const itemUrl = item.affiliate_url || AFFILIATE;
+
     return `
     <a class="ml-card" href="${itemUrl}" target="_blank" rel="noopener sponsored" role="listitem" aria-label="${item.title}">
       <div class="ml-card-img-wrap">
@@ -484,28 +484,24 @@
           ? `<img src="${img}" alt="${item.title}" loading="lazy"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />`
           : ''}
-        <div class="ml-card-emoji" style="${img ? 'display:none' : ''}" aria-hidden="true">${guessEmoji(query)}</div>
+        <div class="ml-card-emoji" style="${img ? 'display:none' : ''}" aria-hidden="true">🛒</div>
+        ${pct >= 5 ? `<span class="ml-card-badge">${pct}% OFF</span>` : ''}
       </div>
       <div class="ml-card-body">
         <p class="ml-card-name">${item.title}</p>
-        ${item.original_price
-          ? `<p class="ml-card-orig">${fmt(item.original_price)}</p>`
-          : ''}
-        <p class="ml-card-price">${fmt(item.price)}</p>
-        ${pct >= 5
-          ? `<p class="ml-card-disc">${pct}% OFF</p>`
-          : ''}
-        ${item.price > 99
-          ? `<p class="ml-card-install">${installments(item.price)}</p>`
-          : ''}
-        ${free
-          ? `<p class="ml-card-shipping">Frete grátis</p>`
-          : ''}
-        <div class="ml-card-tags">
-          ${rated ? '<span class="ml-tag ml-tag-best">Mais vendido</span>' : ''}
-          ${pct >= 20 ? '<span class="ml-tag ml-tag-off">Oferta</span>' : ''}
+        ${item.brand ? `<p class="ml-card-brand">${item.brand}${item.verified ? ' <span class="ml-verified">✔</span>' : ''}</p>` : ''}
+        <div class="ml-card-stars">
+          ${'★'.repeat(Math.round(stars))}${'☆'.repeat(5-Math.round(stars))}
+          <span class="ml-card-sold">${sold}</span>
         </div>
-        <a class="ml-card-cta" href="${itemUrl}" target="_blank" rel="noopener">Comprar no Mercado Livre</a>
+        ${item.original_price
+          ? `<p class="ml-card-orig">R$ ${Number(item.original_price).toLocaleString('pt-BR',{minimumFractionDigits:2})}</p>`
+          : ''}
+        <p class="ml-card-price">R$ <strong>${Number(item.price).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong></p>
+        ${item.price > 99
+          ? `<p class="ml-card-install">em 12x R$ ${(item.price/12).toLocaleString('pt-BR',{minimumFractionDigits:2})} sem juros</p>`
+          : ''}
+        ${free ? `<p class="ml-card-shipping">Frete grátis</p>` : ''}
       </div>
     </a>`;
   }
@@ -525,12 +521,12 @@
   function showError() {
     document.getElementById('mlGrid').innerHTML = `
       <div class="ml-state">
-        <p style="font-size:28px;margin-bottom:12px">😕</p>
-        <p>Não foi possível carregar os produtos.<br>Verifique sua conexão e tente novamente.</p>
-        <button class="ml-retry-btn" onclick="runSearch(query)">Tentar novamente</button>
-        <br><br>
-        <a href="${AFFILIATE}" target="_blank" rel="noopener" style="color:var(--ml-blue-lt);font-size:13px;font-weight:600">
-          Visitar meu perfil no Mercado Livre ↗
+        <p style="font-size:36px;margin-bottom:12px">🛍️</p>
+        <p style="font-size:15px;font-weight:600;color:#333;margin-bottom:8px">Em breve mais produtos aqui!</p>
+        <p style="font-size:13px">Novos produtos serão adicionados em breve.<br>Enquanto isso, visite nosso perfil no Mercado Livre.</p>
+        <br>
+        <a href="${AFFILIATE}" target="_blank" rel="noopener" style="display:inline-block;background:#3483FA;color:white;padding:10px 24px;border-radius:4px;font-size:13px;font-weight:600;text-decoration:none">
+          Ver produtos no Mercado Livre ↗
         </a>
       </div>`;
     document.getElementById('loadMoreWrap').style.display = 'none';
@@ -566,217 +562,14 @@
   }
 
   /* ── Catálogo de produtos embutido ── */
-  const CATALOG = {
-    'moda feminina roupas': [
-      {title:'Vestido Midi Floral Manga Longa Feminino',price:89.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:1243},
-      {title:'Blusa Feminina Viscolycra Manga Curta Estampada',price:39.90,original_price:69.90,shipping:{free_shipping:true},sold_quantity:892},
-      {title:'Calça Jeans Feminina Skinny Cintura Alta',price:119.90,original_price:199.90,shipping:{free_shipping:true},sold_quantity:2341},
-      {title:'Conjunto Feminino Cropped e Saia Midi Plissada',price:79.90,original_price:129.90,shipping:{free_shipping:false},sold_quantity:567},
-      {title:'Shorts Jeans Feminino Destroyed Cintura Alta',price:59.90,original_price:null,shipping:{free_shipping:true},sold_quantity:1089},
-      {title:'Vestido Longo Rodado Estampa Tropical',price:109.90,original_price:179.90,shipping:{free_shipping:true},sold_quantity:743},
-      {title:'Camisa Social Feminina Slim Fit Algodão',price:69.90,original_price:null,shipping:{free_shipping:false},sold_quantity:432},
-      {title:'Saia Midi Plissada Crepe Feminina',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Body Feminino Manga Longa Canelado',price:34.90,original_price:59.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Macaquinho Feminino Estampado Alcinha',price:64.90,original_price:99.90,shipping:{free_shipping:false},sold_quantity:321},
-      {title:'Blazer Feminino Alfaiataria Cropped',price:139.90,original_price:229.90,shipping:{free_shipping:true},sold_quantity:892},
-      {title:'Top Feminino Alcinha Ribana com Bojo',price:29.90,original_price:49.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Calça Wide Leg Feminina Tecido Fluido',price:99.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:1432},
-      {title:'Vestido Chemise Linho Feminino',price:89.90,original_price:null,shipping:{free_shipping:false},sold_quantity:287},
-      {title:'Jaqueta Jeans Feminina Oversized',price:129.90,original_price:199.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Camiseta Feminina Cropped Algodão Premium',price:44.90,original_price:69.90,shipping:{free_shipping:true},sold_quantity:3210},
-    ],
-    'vestido feminino': [
-      {title:'Vestido Midi Floral Manga Longa',price:89.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:1243},
-      {title:'Vestido Longo Madrinha Festa',price:189.90,original_price:299.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Vestido Curto Estampado Verão',price:59.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Vestido Chemise Botões Algodão',price:79.90,original_price:null,shipping:{free_shipping:false},sold_quantity:543},
-      {title:'Vestido Rodado Tule Festa Junina',price:69.90,original_price:119.90,shipping:{free_shipping:true},sold_quantity:721},
-      {title:'Vestido Renda Casamento Civil',price:249.90,original_price:399.90,shipping:{free_shipping:true},sold_quantity:198},
-      {title:'Vestido Tubinho Executivo Feminino',price:109.90,original_price:169.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Vestido Envelope Crepe Midi',price:94.90,original_price:149.90,shipping:{free_shipping:false},sold_quantity:432},
-      {title:'Vestido Babado Tropical Verão',price:74.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Vestido Plissado Festa Noite',price:139.90,original_price:219.90,shipping:{free_shipping:true},sold_quantity:321},
-      {title:'Vestido Jeans Midi com Fenda',price:119.90,original_price:189.90,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Vestido Lastex Alcinha Rodado',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Vestido Malha Ribana Longo',price:84.90,original_price:null,shipping:{free_shipping:false},sold_quantity:287},
-      {title:'Vestido Xadrez Manga Bufante',price:64.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Vestido Formatura Longo Brilho',price:299.90,original_price:499.90,shipping:{free_shipping:true},sold_quantity:143},
-      {title:'Vestido Casual Linho Botões',price:89.90,original_price:139.90,shipping:{free_shipping:true},sold_quantity:432},
-    ],
-    'blusa feminina': [
-      {title:'Blusa Viscolycra Manga Curta Lisa',price:29.90,original_price:49.90,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Blusa Social Chiffon Transparência',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Blusa Cropped Tricot Canelado',price:39.90,original_price:69.90,shipping:{free_shipping:false},sold_quantity:654},
-      {title:'Blusa Feminina Off Shoulder Babado',price:44.90,original_price:74.90,shipping:{free_shipping:true},sold_quantity:1234},
-      {title:'Blusa Estampada Viscose Floral',price:34.90,original_price:null,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Blusa Manga Longa Canelada Básica',price:32.90,original_price:54.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Blusa Envelope Decote V Feminina',price:39.90,original_price:64.90,shipping:{free_shipping:false},sold_quantity:543},
-      {title:'Blusa Transpassada Laço Feminina',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:765},
-      {title:'Blusa Cetim Feminina Elegante',price:64.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Blusa Renda Guipir Manga Longa',price:49.90,original_price:84.90,shipping:{free_shipping:true},sold_quantity:321},
-      {title:'Blusa Listrada Feminina Algodão',price:37.90,original_price:null,shipping:{free_shipping:false},sold_quantity:876},
-      {title:'Blusa Ciganinha Ombro a Ombro',price:42.90,original_price:69.90,shipping:{free_shipping:true},sold_quantity:1098},
-      {title:'Blusa Moletom Feminina Cropped',price:54.90,original_price:84.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Blusa Polo Feminina Piquet',price:59.90,original_price:94.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Blusa Babado Assimétrico Crepe',price:44.90,original_price:74.90,shipping:{free_shipping:false},sold_quantity:287},
-      {title:'Blusa Feminina Tricot Manga Bufante',price:69.90,original_price:109.90,shipping:{free_shipping:true},sold_quantity:543},
-    ],
-    'tenis feminino casual': [
-      {title:'Tênis Feminino Chunky Dad Shoes',price:149.90,original_price:249.90,shipping:{free_shipping:true},sold_quantity:2341},
-      {title:'Tênis Feminino Slip On Plataforma',price:89.90,original_price:149.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Tênis Feminino Sneaker Branco Básico',price:119.90,original_price:189.90,shipping:{free_shipping:true},sold_quantity:3210},
-      {title:'Tênis Feminino Couro Legítimo Oxford',price:179.90,original_price:299.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Tênis Feminino Running Esportivo',price:139.90,original_price:219.90,shipping:{free_shipping:false},sold_quantity:1432},
-      {title:'Tênis Plataforma Feminino Velcro',price:99.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Tênis Feminino Confortável Caminhada',price:129.90,original_price:null,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Tênis Feminino Canvas Estampado',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:1543},
-      {title:'Tênis Feminino Anabela Meia Pata',price:109.90,original_price:179.90,shipping:{free_shipping:false},sold_quantity:543},
-      {title:'Tênis Feminino Casual Colorblock',price:94.90,original_price:154.90,shipping:{free_shipping:true},sold_quantity:765},
-      {title:'Tênis Feminino Brilho Metálico',price:119.90,original_price:199.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Tênis Feminino Converse All Star',price:169.90,original_price:269.90,shipping:{free_shipping:true},sold_quantity:2876},
-      {title:'Tênis Feminino Sapatênis Couro',price:139.90,original_price:219.90,shipping:{free_shipping:false},sold_quantity:321},
-      {title:'Tênis Feminino Slip On Tricot',price:84.90,original_price:134.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Tênis Feminino Jogging Retro',price:159.90,original_price:249.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Tênis Feminino Mule Sem Salto',price:74.90,original_price:119.90,shipping:{free_shipping:true},sold_quantity:1098},
-    ],
-    'bolsa feminina': [
-      {title:'Bolsa Feminina Tote Bag Grande Couro',price:89.90,original_price:149.90,shipping:{free_shipping:true},sold_quantity:1432},
-      {title:'Bolsa Transversal Feminina Mini Bag',price:49.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Bolsa Clutch Festa Dourada',price:39.90,original_price:69.90,shipping:{free_shipping:false},sold_quantity:876},
-      {title:'Bolsa Feminina Mochila Couro PU',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Bolsa Feminina Shoulder Bag Corrente',price:64.90,original_price:109.90,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Bolsa Feminina Sacola Listrada',price:44.90,original_price:null,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Bolsa Feminina Baguete Couro',price:94.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Bolsa Feminina Hobo Camurça',price:74.90,original_price:124.90,shipping:{free_shipping:false},sold_quantity:321},
-      {title:'Bolsa Feminina Carteira Envelope',price:34.90,original_price:59.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Bolsa Feminina Estampada Floral',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:765},
-      {title:'Bolsa Feminina Bucket Cordão',price:69.90,original_price:114.90,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Bolsa Feminina Palha Verão',price:59.90,original_price:99.90,shipping:{free_shipping:false},sold_quantity:432},
-      {title:'Bolsa Feminina Couro Verniz',price:109.90,original_price:179.90,shipping:{free_shipping:true},sold_quantity:287},
-      {title:'Bolsa Feminina Neoprene Colorida',price:44.90,original_price:74.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Bolsa Feminina Quadrada Rígida',price:84.90,original_price:139.90,shipping:{free_shipping:true},sold_quantity:321},
-      {title:'Bolsa Feminina Transparente PVC',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:876},
-    ],
-    'decoracao casa sala': [
-      {title:'Quadro Decorativo Abstrato Sala 60x80cm',price:89.90,original_price:139.90,shipping:{free_shipping:true},sold_quantity:1432},
-      {title:'Espelho Redondo Decorativo Moldura Dourada',price:129.90,original_price:199.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Vaso Decorativo Cerâmica Branco',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Relógio de Parede Moderno Silencioso',price:69.90,original_price:109.90,shipping:{free_shipping:false},sold_quantity:3210},
-      {title:'Porta Retrato Conjunto 3 Peças Dourado',price:39.90,original_price:64.90,shipping:{free_shipping:true},sold_quantity:1543},
-      {title:'Almofada Decorativa Veludo 45x45cm',price:34.90,original_price:54.90,shipping:{free_shipping:true},sold_quantity:2876},
-      {title:'Planta Artificial Suculenta Vaso',price:29.90,original_price:null,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Bandeja Decorativa Madeira Organizadora',price:44.90,original_price:74.90,shipping:{free_shipping:false},sold_quantity:765},
-      {title:'Luminária de Mesa LED Abajur',price:89.90,original_price:149.90,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Tapete Sala Geométrico 200x250cm',price:179.90,original_price:299.90,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Prateleira Flutuante MDF Branco',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Difusor Aromatizador Ambiente Bambu',price:39.90,original_price:64.90,shipping:{free_shipping:false},sold_quantity:2341},
-      {title:'Escultura Decorativa Abstrata Resina',price:64.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Kit Velas Aromáticas Decorativas',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:1098},
-      {title:'Moldura Espelho Hexagonal Dourado',price:74.90,original_price:119.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Porta Livros Decorativo Metal',price:44.90,original_price:69.90,shipping:{free_shipping:true},sold_quantity:876},
-    ],
-    'cama mesa banho': [
-      {title:'Jogo de Lençol Casal Microfibra 4 Peças',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Edredom Casal Plush Manta Felpuda',price:119.90,original_price:199.90,shipping:{free_shipping:true},sold_quantity:2876},
-      {title:'Toalha de Banho Felpuda 70x140cm',price:34.90,original_price:54.90,shipping:{free_shipping:true},sold_quantity:5432},
-      {title:'Jogo de Toalhas 5 Peças Algodão',price:89.90,original_price:149.90,shipping:{free_shipping:false},sold_quantity:1876},
-      {title:'Almofada Travesseiro Viscoelástico',price:69.90,original_price:109.90,shipping:{free_shipping:true},sold_quantity:3210},
-      {title:'Colcha Matelassê Casal Floral',price:99.90,original_price:159.90,shipping:{free_shipping:true},sold_quantity:1543},
-      {title:'Jogo de Cama Percal 200 Fios',price:139.90,original_price:219.90,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Protetor de Colchão Impermeável Casal',price:59.90,original_price:94.90,shipping:{free_shipping:false},sold_quantity:2109},
-      {title:'Toalha de Rosto Bordada 50x80cm',price:19.90,original_price:32.90,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Kit Banheiro 3 Peças Porta Sabonete',price:44.90,original_price:74.90,shipping:{free_shipping:true},sold_quantity:1098},
-      {title:'Cortina para Quarto Blackout',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:2341},
-      {title:'Fronha Oxford 50x70cm Par',price:24.90,original_price:39.90,shipping:{free_shipping:true},sold_quantity:3456},
-      {title:'Cobre Leito Casal Queen 3 Peças',price:109.90,original_price:174.90,shipping:{free_shipping:false},sold_quantity:765},
-      {title:'Tapete de Banheiro Antiderrapante',price:29.90,original_price:null,shipping:{free_shipping:true},sold_quantity:2876},
-      {title:'Cobertor Manta Soft Casal',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:4109},
-      {title:'Mosquiteiro Casal Teto Princesa',price:64.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:876},
-    ],
-    'luminaria decorativa': [
-      {title:'Luminária de Mesa LED Touch Regulável',price:89.90,original_price:149.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Luminária de Chão Tripé Madeira',price:199.90,original_price:319.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Lustre Pendente Rattan Boho',price:149.90,original_price:239.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Luminária Abajur Veludo Rosa',price:119.90,original_price:189.90,shipping:{free_shipping:false},sold_quantity:321},
-      {title:'Fita LED RGB Colorida 5 Metros',price:39.90,original_price:64.90,shipping:{free_shipping:true},sold_quantity:5432},
-      {title:'Luminária Neon Personalizada',price:89.90,original_price:139.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Abajur Cilíndrico Linho Bege',price:69.90,original_price:109.90,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Spot LED Embutir Redondo 9W',price:24.90,original_price:39.90,shipping:{free_shipping:false},sold_quantity:3210},
-      {title:'Luminária Solar Jardim Espeto',price:44.90,original_price:74.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Pendente Industrial Aramado',price:129.90,original_price:209.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Luminária Origami Papel Dobrável',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:765},
-      {title:'Plafon LED Redondo 18W Embutir',price:34.90,original_price:54.90,shipping:{free_shipping:true},sold_quantity:2876},
-      {title:'Luminária Usb Recarregável Portátil',price:49.90,original_price:79.90,shipping:{free_shipping:false},sold_quantity:1543},
-      {title:'Luminária Madeira Rústica Pinha',price:79.90,original_price:124.90,shipping:{free_shipping:true},sold_quantity:321},
-      {title:'Pendente Globo Vidro Fumê',price:109.90,original_price:174.90,shipping:{free_shipping:true},sold_quantity:543},
-      {title:'Luminária Infantil Projetor Estrelas',price:64.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:987},
-    ],
-    'vaso planta decorativo': [
-      {title:'Vaso Cachepô Cerâmica Branco P/M/G',price:39.90,original_price:64.90,shipping:{free_shipping:true},sold_quantity:3210},
-      {title:'Vaso Autoirrigável Plástico Colorido',price:29.90,original_price:49.90,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Vaso Terracota Artesanal Barro',price:24.90,original_price:null,shipping:{free_shipping:false},sold_quantity:1876},
-      {title:'Vaso Geométrico Metal Dourado',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:987},
-      {title:'Vaso Suculenta Cimento Mini',price:19.90,original_price:32.90,shipping:{free_shipping:true},sold_quantity:5432},
-      {title:'Vaso Pendente Macramê Juta',price:34.90,original_price:59.90,shipping:{free_shipping:true},sold_quantity:2109},
-      {title:'Vaso Cerâmica Japonesa Azul',price:69.90,original_price:109.90,shipping:{free_shipping:false},sold_quantity:543},
-      {title:'Vaso Grande Fibra de Vidro Cinza',price:149.90,original_price:239.90,shipping:{free_shipping:true},sold_quantity:321},
-      {title:'Vaso Plástico Rústico Madeira',price:44.90,original_price:74.90,shipping:{free_shipping:true},sold_quantity:1543},
-      {title:'Vaso Marmorizado Moderno',price:49.90,original_price:79.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Vaso Palha Rattan Natural',price:39.90,original_price:64.90,shipping:{free_shipping:false},sold_quantity:654},
-      {title:'Vaso Espártilho Corda Macramê',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Vaso Cuia Bambu Decorativo',price:34.90,original_price:null,shipping:{free_shipping:true},sold_quantity:1098},
-      {title:'Vaso Anfora Cerâmica Vintage',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:287},
-      {title:'Vaso Cone Fibrocimento P',price:29.90,original_price:49.90,shipping:{free_shipping:true},sold_quantity:2341},
-      {title:'Jardim Vertical Painel 9 Vasos',price:89.90,original_price:144.90,shipping:{free_shipping:true},sold_quantity:543},
-    ],
-    'jogo de panelas': [
-      {title:'Jogo de Panelas Antiaderente 5 Peças Granite',price:189.90,original_price:319.90,shipping:{free_shipping:true},sold_quantity:3210},
-      {title:'Jogo de Panelas Inox 7 Peças Premium',price:299.90,original_price:499.90,shipping:{free_shipping:true},sold_quantity:1432},
-      {title:'Frigideira Antiaderente 24cm Wok',price:59.90,original_price:99.90,shipping:{free_shipping:true},sold_quantity:4321},
-      {title:'Panela de Pressão Elétrica 5L Digital',price:249.90,original_price:399.90,shipping:{free_shipping:false},sold_quantity:2109},
-      {title:'Jogo de Frigideiras 3 Tamanhos',price:89.90,original_price:149.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Panela Esmaltada Le Creuset 26cm',price:179.90,original_price:289.90,shipping:{free_shipping:true},sold_quantity:654},
-      {title:'Wok Ferro Fundido Profissional',price:129.90,original_price:209.90,shipping:{free_shipping:true},sold_quantity:432},
-      {title:'Conjunto Utensílios Silicone 8 Peças',price:49.90,original_price:79.90,shipping:{free_shipping:false},sold_quantity:2876},
-      {title:'Panela Elétrica Arroz 5 Xícaras',price:89.90,original_price:144.90,shipping:{free_shipping:true},sold_quantity:3456},
-      {title:'Cafeteira Italiana Moka 3 Xícaras',price:69.90,original_price:109.90,shipping:{free_shipping:true},sold_quantity:1543},
-      {title:'Forma Antiaderente Redonda 26cm',price:29.90,original_price:49.90,shipping:{free_shipping:true},sold_quantity:2341},
-      {title:'Chaleira Elétrica 1.7L Inox',price:79.90,original_price:129.90,shipping:{free_shipping:true},sold_quantity:1876},
-      {title:'Assadeira Retangular Alumínio',price:24.90,original_price:39.90,shipping:{free_shipping:false},sold_quantity:3210},
-      {title:'Jogo Bowls Cerâmica 4 Peças',price:54.90,original_price:89.90,shipping:{free_shipping:true},sold_quantity:876},
-      {title:'Escorredor Macarrão Inox 24cm',price:39.90,original_price:null,shipping:{free_shipping:true},sold_quantity:1098},
-      {title:'Air Fryer 4L Digital Touch Screen',price:299.90,original_price:479.90,shipping:{free_shipping:true},sold_quantity:4109},
-    ],
-  };
-
-  /* ── Produtos reais com link de afiliado ── */
-  const FEATURED = [
-    {
-      title: 'Kit 2 Tinturas Grecin 5 Gel Barba E Bigode 28g Preto',
-      price: 120.31,
-      original_price: 139.00,
-      thumbnail: 'https://http2.mlstatic.com/D_NQ_NP_2X_871351-MLB107649627441_022026-F.webp',
-      affiliate_url: 'https://meli.la/1FrUmuF',
-      shipping: { free_shipping: true },
-      sold_quantity: 5000,
-      featured: true,
-    },
-  ];
-
   const DEFAULT_KEY = 'moda feminina roupas';
 
+
   function getProducts(q, off, srt) {
-    const keys = Object.keys(CATALOG);
-    let key = keys.find(k => q.toLowerCase().includes(k.split(' ')[0]));
-    if (!key) {
-      // Try partial match
-      key = keys.find(k => k.split(' ').some(w => q.toLowerCase().includes(w)));
-    }
-    if (!key) key = DEFAULT_KEY;
-    let items = [...CATALOG[key]];
+    let items = [...FEATURED];
     if (srt === 'price_asc') items.sort((a,b) => a.price - b.price);
     if (srt === 'price_desc') items.sort((a,b) => b.price - a.price);
-    return { results: items.slice(off, off + PAGE_SIZE), total: items.length, key };
+    return { results: items.slice(off, off + PAGE_SIZE), total: items.length };
   }
 
   async function fetchProducts(q, off, srt, append) {
@@ -788,14 +581,9 @@
 
     try {
       const { results, total: t } = getProducts(q, off, srt);
-      // Prepend featured real products on first page
-      let finalResults = results;
-      if (!append && off === 0) {
-        finalResults = [...FEATURED, ...results];
-      }
-      total  = t + (off === 0 ? FEATURED.length : 0);
+      total  = t;
       offset = off + results.length;
-      renderResults(finalResults, append);
+      renderResults(results, append);
     } catch {
       if (!append) showError();
     } finally {
