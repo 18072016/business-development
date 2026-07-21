@@ -476,8 +476,9 @@
     const free  = item.shipping?.free_shipping;
     const rated = item.seller?.seller_reputation?.level_id === 'platinum' || item.sold_quantity > 50;
 
+    const itemUrl = item.affiliate_url || AFFILIATE;
     return `
-    <a class="ml-card" href="${AFFILIATE}" target="_blank" rel="noopener sponsored" role="listitem" aria-label="${item.title}">
+    <a class="ml-card" href="${itemUrl}" target="_blank" rel="noopener sponsored" role="listitem" aria-label="${item.title}">
       <div class="ml-card-img-wrap">
         ${img
           ? `<img src="${img}" alt="${item.title}" loading="lazy"
@@ -504,7 +505,7 @@
           ${rated ? '<span class="ml-tag ml-tag-best">Mais vendido</span>' : ''}
           ${pct >= 20 ? '<span class="ml-tag ml-tag-off">Oferta</span>' : ''}
         </div>
-        <a class="ml-card-cta" href="${AFFILIATE}" target="_blank" rel="noopener">Comprar no Mercado Livre</a>
+        <a class="ml-card-cta" href="${itemUrl}" target="_blank" rel="noopener">Comprar no Mercado Livre</a>
       </div>
     </a>`;
   }
@@ -748,6 +749,20 @@
     ],
   };
 
+  /* ── Produtos reais com link de afiliado ── */
+  const FEATURED = [
+    {
+      title: 'Kit 2 Tinturas Grecin 5 Gel Barba E Bigode 28g Preto',
+      price: 120.31,
+      original_price: 139.00,
+      thumbnail: 'https://http2.mlstatic.com/D_NQ_NP_2X_871351-MLB107649627441_022026-F.webp',
+      affiliate_url: 'https://meli.la/1FrUmuF',
+      shipping: { free_shipping: true },
+      sold_quantity: 5000,
+      featured: true,
+    },
+  ];
+
   const DEFAULT_KEY = 'moda feminina roupas';
 
   function getProducts(q, off, srt) {
@@ -773,9 +788,14 @@
 
     try {
       const { results, total: t } = getProducts(q, off, srt);
-      total  = t;
+      // Prepend featured real products on first page
+      let finalResults = results;
+      if (!append && off === 0) {
+        finalResults = [...FEATURED, ...results];
+      }
+      total  = t + (off === 0 ? FEATURED.length : 0);
       offset = off + results.length;
-      renderResults(results, append);
+      renderResults(finalResults, append);
     } catch {
       if (!append) showError();
     } finally {
