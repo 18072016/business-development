@@ -190,11 +190,15 @@
        PRODUCT GRID
     ══════════════════════════ */
     .ml-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 220px));
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 20px;
-      justify-content: start;
+      align-items: flex-start;
+    }
+    .ml-card {
+      width: 220px !important;
+      flex-shrink: 0;
     }
 
     /* ── Card ── */
@@ -323,12 +327,12 @@
     @media (max-width: 768px) {
       .ml-hero-deco  { display: none; }
       .ml-hero-title { font-size: 20px; }
-      .ml-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .ml-card { width: calc(50% - 4px) !important; }
       .ml-nav  { display: none; }
     }
     @media (max-width: 420px) {
-      .ml-grid { grid-template-columns: repeat(2, 1fr); }
-      .ml-card-img-wrap { height: 140px; }
+      .ml-card { width: calc(50% - 4px) !important; }
+      .ml-card-img-wrap { aspect-ratio: 1/1; }
       .ml-card-price { font-size: 18px; }
     }
     @media (prefers-reduced-motion: reduce) {
