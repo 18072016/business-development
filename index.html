@@ -196,11 +196,6 @@
       margin-bottom: 20px;
       align-items: flex-start;
     }
-    .ml-card {
-      width: 220px !important;
-      flex-shrink: 0;
-    }
-
     /* ── Card ── */
     .ml-card {
       background: var(--ml-white); border-radius: 6px;
@@ -209,7 +204,8 @@
       text-decoration: none; color: var(--ml-text);
       transition: box-shadow .15s, transform .15s;
       border: 1px solid var(--ml-border);
-      min-width: 0;
+      width: 220px;
+      flex-shrink: 0;
     }
     .ml-card:hover { box-shadow: var(--ml-shadow-hv); transform: translateY(-2px); border-color: #ccc; }
 
